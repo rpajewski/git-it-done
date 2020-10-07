@@ -1,5 +1,19 @@
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
+
+var getRepoName = function() {
+    var queryString = document.location.search;
+    var repoName = queryString.split("=")[1];
+
+    // check to make sure repo name is true
+    if (repoName) {
+        getRepoIssues(repoName);
+        repoNameEl.textContent = repoName;
+    } else {
+        document.location.replace("./index.html");
+    }
+};
 
 var displayWarning = function(repo) {
     // add text to warning container
@@ -51,9 +65,9 @@ var displayIssues = function(issues) {
     }
 };
 
-var getRepoIssues = function(repo) {
+var getRepoIssues = function(repoName) {
     // format the github api url
-    var apiUrl = `https://api.github.com/repos/${repo}/issues?direction=asc`;
+    var apiUrl = `https://api.github.com/repos/${repoName}/issues?direction=asc`;
   
     // make a request to the url
     fetch(apiUrl)
@@ -66,11 +80,11 @@ var getRepoIssues = function(repo) {
 
                     // check if api has paginated issues
                     if (response.headers.get("Link")) {
-                        displayWarning(repo);
+                        displayWarning(repoName);
                     }
                 });
             } else {
-                alert("There was a problem with your request!");
+                document.location.replace("./index.html");
             }
         })
         .catch(function(error) {
@@ -79,4 +93,4 @@ var getRepoIssues = function(repo) {
     });
 };
   
-getRepoIssues('twitter/scalding');
+getRepoName();
